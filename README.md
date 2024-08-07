@@ -22,7 +22,7 @@ Other: use reactRouter to route to different components
 Note: Inspired by Dr.Angela Yu for FRONT-END STYLING ONLY, added way more features and animation for front-end.
 
 back-end: Using Node.js, Express.js, PostgreSQL to build a backend, passport and express-session also used to maintain user login credentials, used hashing and salting to 
-encrypt user data and basic CRUD action. Used passport to only keep authorized user into home page.
+encrypt user data and basic CRUD action. Used passport to only keep authorized user into home page. User can only see their notes by authentication process and login.
 
 Still have a lot to improve, feel free to add more features and optimize the code.
 
