@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      - POSTGRES_USER=chenhe
+      - POSTGRES_PASSWORD=12011201
+      - POSTGRES_DB=keepers
+    ports:
+      - "5432"
+
+
+  backend:
+    build: ./back-end
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./back-end:/usr/src/app
+    depends_on:
+      - postgres
+    environment:
+      - PGHOST=postgres
+      - PGUSER=chenhe
+      - PGPASSWORD=12011201
+      - PGDATABASE=keepers
+
+  frontend:
+    build: ./front-end
+    restart: always
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./front-end:/usr/src/app

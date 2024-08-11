@@ -8,10 +8,12 @@ import { Strategy } from "passport-local";
 import session from "express-session";
 
 const app = express()
-const port = 3000
 const saltRounds = 5;
 
 env.config()
+
+const port = process.env.PORT || 3001
+
 
 app.use(
     session({
@@ -22,23 +24,46 @@ app.use(
 );
 
 
-app.use(cors())
+app.use(cors({origin: "http://localhost:5173"}))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 
 
-
 const db = new pg.Client({
-    user: process.env.PG_USER,
-    host: process.env.PG_HOST,
-    database: process.env.PG_DATABASE,
-    password: process.env.PG_PASSWORD,
-    port: process.env.PG_PORT,
+    user: process.env.PG_USER || "postgres",
+    host: process.env.PG_HOST || "localhost",
+    database: process.env.PG_DATABASE || "keeper",
+    password: process.env.PG_PASSWORD || "1201",
+    port: process.env.PG_PORT || 5432,
 });
   
 db.connect();
+
+async function createTables() {
+  try {
+    await db.query(`
+          CREATE TABLE IF NOT EXISTS users (
+            uid SERIAL PRIMARY KEY,
+            user_name VARCHAR(40) NOT NULL UNIQUE,
+            password VARCHAR(200) NOT NULL
+          );
+        `);
+    await db.query(`CREATE TABLE IF NOT EXISTS notes (
+      nid SERIAL,
+      user_name VARCHAR(40) REFERENCES users(user_name),
+      title VARCHAR(50) NOT NULL,
+      content VARCHAR(100) NOT NULL,
+      PRIMARY KEY (nid, user_name)
+    );`);
+    console.log('Tables created successfully.');
+  } catch (err) {
+    console.error('Error creating tables:', err);
+  }
+}
+
+await createTables();
 
 
 //passport and session setup
@@ -88,7 +113,7 @@ app.get("/api/show-data/:user", async (req, res) => {
       res.status(200).json(notes);
     } catch (err) {
       console.log("Error fetching notes", err);
-      res.status(500).json({ error: "Internal Server Error" });
+      res.status(500).json({ error: "Internal Server Errors" });
     }
   });
 
