@@ -66,15 +66,15 @@ async function createTables() {
 await createTables();
 
 
-//passport and session setup
+
+
+
 
 
 
 async function showNotes(user) {
     try {
-        console.log(user)
         const response = await db.query("SELECT b.nid, b.title, b.content FROM notes b INNER JOIN users a ON b.user_name = a.user_name WHERE a.user_name = $1", [user])
-        console.log(response)
         return response.rows
     } catch (err) {
         console.log("ERROR DB FOR", err)
@@ -105,12 +105,38 @@ async function createNotes(content) {
     }
 }
 
+async function getUserName() {
+  try {
+    const response = await db.query("SELECT uid, user_name FROM users")
+    return response.rows
+  } catch (err) {
+    console.log("ERROR DB FOR", err)
+  }
+}
+
+//auth not needed
+app.get("/api/users", async (req, res) => {
+  try {
+      const users = await getUserName()
+      res.status(200).json(users)
+  } catch (err) {
+    console.log("Error fetching notes", err);
+    res.status(500).json({ error: "Internal Server Errors" });
+  }
+})
+
+
+
 
 app.get("/api/show-data/:user", async (req, res) => {
     try {
-      const user = req.params.user
-      const notes = await showNotes(user);
-      res.status(200).json(notes);
+      if (req.isAuthenticated()){
+        const user = req.params.user
+        const notes = await showNotes(user);
+        res.status(200).json(notes);
+      } else {
+        res.status(401).json({error: "Unauthorized"})
+      }
     } catch (err) {
       console.log("Error fetching notes", err);
       res.status(500).json({ error: "Internal Server Errors" });
@@ -119,9 +145,13 @@ app.get("/api/show-data/:user", async (req, res) => {
 
   app.delete("/api/delete-data/:id", async (req, res) => {
     try {
-      const id = req.params.id;
-      await deleteNotes(id)
-      res.status(200).json({ message: `Note with id ${id} deleted successfully` });
+      if (req.isAuthenticated()) {
+        const id = req.params.id;
+        await deleteNotes(id)
+        res.status(200).json({ message: `Note with id ${id} deleted successfully` });
+      } else {
+        res.status(401).json({error: "Unauthorized"})
+      }
     } catch (err) {
       console.log("Error deleting note", err);
       res.status(500).json({ error: "Internal Server Error" });
@@ -130,9 +160,13 @@ app.get("/api/show-data/:user", async (req, res) => {
 
   app.patch("/api/edit-data/note", async (req, res) => {
     try {
-      const note = req.body
-      await editNotes(note)
-      res.status(200).json({ message: `Note edited successfully` });
+      if (req.isAuthenticated()) {
+        const note = req.body
+        await editNotes(note)
+        res.status(200).json({ message: `Note edited successfully` });
+      } else {
+        res.status(401).json({error: "Unauthorized"})
+      }
     } catch (err) {
       console.log("Error fetching notes", err);
       res.status(500).json({ error: "Internal Server Error" });
@@ -141,12 +175,16 @@ app.get("/api/show-data/:user", async (req, res) => {
 
   app.post("/api/post-data/note/:user", async (req, res) => {
     try {
-      const note = {
-        ...req.body,
-        user_name: req.params.user
+      if (req.isAuthenticated()){
+        const note = {
+          ...req.body,
+          user_name: req.params.user
+        }
+        await createNotes(note)
+        res.status(200).json({ message: `Note added added successfully` });
+      } else {
+        res.status(401).json({error: "Unauthorized"})
       }
-      await createNotes(note)
-      res.status(200).json({ message: `Note added added successfully` });
     } catch (err) {
       console.log("Error fetching notes", err);
       res.status(500).json({ error: "Internal Server Error" });
@@ -202,6 +240,10 @@ app.get("/api/show-data/:user", async (req, res) => {
       });
     })(req, res, next);
   });
+
+  app.post('/api/getLinkedUser', async (req, res) => {
+    await updateRelation(req.body)
+  })
   
 
 
@@ -249,6 +291,8 @@ app.get("/api/show-data/:user", async (req, res) => {
         res.status(401).json({message: "unauthorized"})
     }
   })
+
+
 
   passport.serializeUser((user, cb) => {
     cb(null, user);

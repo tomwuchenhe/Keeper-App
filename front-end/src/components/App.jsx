@@ -7,7 +7,9 @@ import axios from "axios"
 import { useNavigate } from "react-router-dom";
 
 
+
 function App() {
+
 
   async function verifyUser(nav, set) {
     try {
@@ -27,19 +29,25 @@ function App() {
     }
   }
 
+
   const [notes, setNotes] = useState([]);
   const [updateTrigger, setUpdateTrigger] = useState(false); 
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState(null)
   const nav = useNavigate()
 
+  //initialization
   useEffect(() => {
     async function loading() {
-       await verifyUser(nav, setLoading)
-       setUser(await getUser())
-    } 
+      const [temp, val] = await Promise.all([
+        verifyUser(nav, setLoading),  
+        getUser(),        
+      ])
+      setUser(val)
+    }
     loading()
   },[])
+  
 
 
   async function getNote() {
@@ -82,13 +90,13 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       if (user)
-        await getNote();
+        await getNote()
+          
     };
     fetchData();
   }, [updateTrigger, user]);
 
-
-
+//{acceptLinkAwait ? <Confirmation detail={user}/> : <BasicSelect addU = {postLinkedUser} curU = {user}/>}
   return (
     !loading &&
     <div>
