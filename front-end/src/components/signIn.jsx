@@ -17,6 +17,9 @@ import Alert from '@mui/material/Alert';
 import {useState} from "react"
 import { useNavigate } from 'react-router-dom';
 
+//production mode
+const REACT_API_ADDRESS= 'https://server-dot-keeper-app-432221.uc.r.appspot.com'
+
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
@@ -35,7 +38,7 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 async function logIn(data) {
-    const response = await axios.post("/api/logIn/submit", data)
+    const response = await axios.post(`${REACT_API_ADDRESS}/api/logIn/submit`, data, {withCredentials: true})
     return response
 }
 

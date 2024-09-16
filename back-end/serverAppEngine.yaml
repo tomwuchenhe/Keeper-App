@@ -1,0 +1,9 @@
+runtime: nodejs20
+service: server
+env_variables:
+  PG_USER: "postgres"
+  PG_HOST: "35.224.170.36"
+  PG_DATABASE: "postgres"
+  PG_PASSWORD: "Wchyy1201"
+  PG_PORT: "5432"
+  SESSION_SECRET: "TOPSECRETWORD"

@@ -12,11 +12,26 @@ const saltRounds = 5;
 
 env.config()
 
-const port = process.env.PORT || 3001
+const port = process.env.PORT || 8080
 
+const db = new pg.Client({
+  user: process.env.PG_USER ,
+  host: process.env.NODE_ENV == "production" ? process.env.PG_HOST : "localhost",
+  database: process.env.NODE_ENV == "production" ? process.env.PG_DATABASE : "keeper" ,
+  password: process.env.NODE_ENV == "production" ? process.env.PG_PASSWORD : "1201",
+  port: process.env.PG_PORT,
+});
+
+db.connect();
 
 app.use(
     session({
+      cookie: {
+        secure: true,
+        maxAge: 1000 * 60 * 60 * 24,
+        sameSite: "none",
+        httpOnly: true
+      },
       secret: process.env.SESSION_SECRET,
       resave: false,
       saveUninitialized: true,
@@ -24,22 +39,25 @@ app.use(
 );
 
 
-app.use(cors({origin: "http://localhost:5173"}))
+
+app.set('trust proxy', 1); // for production environments behind a proxy
+
+app.use(cors({origin: "https://keeper-app-432221.uc.r.appspot.com", credentials: true}))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-
-const db = new pg.Client({
-    user: process.env.PG_USER || "postgres",
-    host: process.env.PG_HOST || "localhost",
-    database: process.env.PG_DATABASE || "keeper",
-    password: process.env.PG_PASSWORD || "1201",
-    port: process.env.PG_PORT || 5432,
+//debugging
+app.use((req, res, next) => {
+  console.log('Session ID:', req.sessionID);
+  console.log('Is Authenticated:', req.isAuthenticated());
+  console.log('User:', req.user); // Should have the deserialized user object
+  console.log('Session Passport User:', req.session?.passport?.user);
+  next();
 });
-  
-db.connect();
+
+
 
 async function createTables() {
   try {
@@ -64,12 +82,6 @@ async function createTables() {
 }
 
 await createTables();
-
-
-
-
-
-
 
 
 async function showNotes(user) {
@@ -240,10 +252,6 @@ app.get("/api/show-data/:user", async (req, res) => {
       });
     })(req, res, next);
   });
-
-  app.post('/api/getLinkedUser', async (req, res) => {
-    await updateRelation(req.body)
-  })
   
 
 
@@ -269,6 +277,7 @@ app.get("/api/show-data/:user", async (req, res) => {
               return cb(err);
             } else {
               if (valid) {
+                console.log(user)
                 return cb(null, user);
               } else {
                 return cb(null, false, { message: 'Wrong password' });
@@ -285,6 +294,7 @@ app.get("/api/show-data/:user", async (req, res) => {
   );
   
   app.get("/api/verify", (req, res) => {
+    console.log(req.user)
     if (req.isAuthenticated()) {
         res.status(200).json({message: "user verified", user: req.user.user_name})
     } else {
@@ -292,13 +302,26 @@ app.get("/api/show-data/:user", async (req, res) => {
     }
   })
 
+  app.get("/api/test", (req, res) => {
+    res.status(200).send(`This is testing ${req.isAuthenticated()}, ${req.user}`)
+  })
 
 
   passport.serializeUser((user, cb) => {
+    if (user) {
+      console.log("We have stored"+ user.uid + " " + user.user_name + " " + user.password)
+    }else{
+      console.log("nothing store")
+    }
     cb(null, user);
   });
   
   passport.deserializeUser((user, cb) => {
+    if (user) {
+      console.log("We have got"+ user.uid + " " + user.user_name + " " + user.password)
+    }else{
+      console.log("nothing got")
+    }
     cb(null, user);
   });
   

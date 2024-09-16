@@ -4,7 +4,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import { Fab, Zoom, Slide } from "@mui/material";
 
-
 function Note(props) {
   const [noteEdit, setNoteEdit] = useState({
     new_title: props.title,

@@ -1,0 +1,25 @@
+runtime: python39
+service: default
+
+handlers:
+  # Catch-all route to serve index.html for all other routes (SPA)\
+
+  - url: /styles.css
+    static_files: dist/styles.css
+    upload: dist/styles.css
+
+  - url: /assets/index-Dcr7zaaZ.js
+    static_files: dist/assets/index-Dcr7zaaZ.js
+    upload: dist/assets/index-Dcr7zaaZ.js
+
+  - url: /
+    static_files: dist/index.html
+    upload: dist/index.html
+
+  - url: /signup
+    static_files: dist/index.html
+    upload: dist/index.html
+
+  - url: /home
+    static_files: dist/index.html
+    upload: dist/index.html

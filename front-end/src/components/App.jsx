@@ -6,14 +6,15 @@ import CreateArea from "./CreateArea";
 import axios from "axios"
 import { useNavigate } from "react-router-dom";
 
-
+//production mode
+const REACT_API_ADDRESS = 'https://server-dot-keeper-app-432221.uc.r.appspot.com'
 
 function App() {
 
 
   async function verifyUser(nav, set) {
     try {
-       await axios.get("/api/verify")
+       await axios.get(`${REACT_API_ADDRESS}/api/verify`, {}, {withCredentials: true})
        set(false)
     } catch {
       nav("/")
@@ -22,7 +23,7 @@ function App() {
 
   async function getUser() {
     try {
-      const response = await axios.get("/api/verify")
+      const response = await axios.get(`${REACT_API_ADDRESS}/api/verify` , {}, {withCredentials: true})
       return response.data.user
     } catch (err) {
       console.log(err)
@@ -52,7 +53,7 @@ function App() {
 
   async function getNote() {
     try {
-      const response = await axios.get(`/api/show-data/${user}`)
+      const response = await axios.get(`${REACT_API_ADDRESS}/api/show-data/${user}`, {}, {withCredentials: true})
       setNotes(response.data)
     } catch (err) {
       console.log("ERROR FOR", err)
@@ -61,7 +62,7 @@ function App() {
 
   async function deleteNote(id) {
     try {
-      await axios.delete(`/api/delete-data/${id}`)
+      await axios.delete(`${REACT_API_ADDRESS}/api/delete-data/${id}`, {}, {withCredentials: true})
       setUpdateTrigger(!updateTrigger)
     } catch (err) {
       console.log("ERROR FOR", err)
@@ -70,7 +71,7 @@ function App() {
 
   async function editNote(note) {
     try {
-      await axios.patch("/api/edit-data/note/", note)
+      await axios.patch(`${REACT_API_ADDRESS}/api/edit-data/note/`, note)
       setUpdateTrigger(!updateTrigger)
     } catch (err) {
       console.log("ERROR FOR", err)
@@ -80,7 +81,7 @@ function App() {
   async function insertNote(note) {
     try {
       console.log(user)
-      await axios.post(`/api/post-data/note/${user}`, note)
+      await axios.post(`${REACT_API_ADDRESS}/api/post-data/note/${user}`, note)
       setUpdateTrigger(!updateTrigger)
     } catch (err) {
       console.log("ERROR FOR", err)

@@ -7,7 +7,9 @@ import axios from 'axios';
 import { Button } from '@mui/material';
 import {useState, useEffect} from 'react'
 
+//production mode
 
+const REACT_API_ADDRESS= 'https://server-dot-keeper-app-432221.uc.r.appspot.com'
 
 export default function BasicSelect(props) {
   const [selectedUser, setSelectedUser] = useState(''); // For selected user
@@ -15,7 +17,7 @@ export default function BasicSelect(props) {
 
   async function getUser() {
     try {
-      const response = await axios.get('/api/users');
+      const response = await axios.get(`${REACT_API_ADDRESS}/api/users`);
       setUsers(response.data); // Set users to the list of fetched users
     } catch (err) {
       console.log("ERROR FOR", err);
