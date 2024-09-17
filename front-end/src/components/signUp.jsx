@@ -14,9 +14,7 @@ import axios from 'axios';
 import {useState} from "react"
 import Alert from '@mui/material/Alert';
 import { useNavigate } from 'react-router-dom';
-
-
-const REACT_API_ADDRESS= 'https://server-dot-keeper-app-432221.uc.r.appspot.com'
+import { baseAPI } from './App';
 
 function Copyright(props) {
   return (
@@ -36,7 +34,7 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 async function passData(data) {
-    const response = await axios.post(`${REACT_API_ADDRESS}/api/signUp/submit`, data)
+    const response = await baseAPI.post("/api/signUp/submit", data)
     return response
 }
 
@@ -80,7 +78,7 @@ export default function SignUp() {
 
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Container component="main" maxWidth="md">
+      <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
           sx={{

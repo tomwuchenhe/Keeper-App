@@ -8,9 +8,9 @@ handlers:
     static_files: dist/styles.css
     upload: dist/styles.css
 
-  - url: /assets/index-Dcr7zaaZ.js
-    static_files: dist/assets/index-Dcr7zaaZ.js
-    upload: dist/assets/index-Dcr7zaaZ.js
+  - url: /assets/index-BA2l2c5g.js
+    static_files: dist/assets/index-BA2l2c5g.js
+    upload: dist/assets/index-BA2l2c5g.js
 
   - url: /
     static_files: dist/index.html
@@ -23,3 +23,4 @@ handlers:
   - url: /home
     static_files: dist/index.html
     upload: dist/index.html
+  

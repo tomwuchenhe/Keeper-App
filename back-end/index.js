@@ -8,29 +8,19 @@ import { Strategy } from "passport-local";
 import session from "express-session";
 
 const app = express()
+const port = process.env.NODE_PORT || 8080
 const saltRounds = 5;
 
 env.config()
 
-const port = process.env.PORT || 8080
-
-const db = new pg.Client({
-  user: process.env.PG_USER ,
-  host: process.env.NODE_ENV == "production" ? process.env.PG_HOST : "localhost",
-  database: process.env.NODE_ENV == "production" ? process.env.PG_DATABASE : "keeper" ,
-  password: process.env.NODE_ENV == "production" ? process.env.PG_PASSWORD : "1201",
-  port: process.env.PG_PORT,
-});
-
-db.connect();
-
 app.use(
     session({
       cookie: {
+        maxAge: 60*60*60*8,
         secure: true,
-        maxAge: 1000 * 60 * 60 * 24,
-        sameSite: "none",
-        httpOnly: true
+        sameSite: 'none',
+        httpOnly: false,
+        path: '/'
       },
       secret: process.env.SESSION_SECRET,
       resave: false,
@@ -40,23 +30,25 @@ app.use(
 
 
 
+const db = new pg.Client({
+    user: process.env.PG_USER,
+    host: process.env.PG_HOST,
+    database: process.env.PG_DATABASE,
+    password: process.env.PG_PASSWORD,
+    port: process.env.PG_PORT,
+});
+
+db.connect();
+
+
 app.set('trust proxy', 1); // for production environments behind a proxy
 
+//https://keeper-app-432221.uc.r.appspot.com
 app.use(cors({origin: "https://keeper-app-432221.uc.r.appspot.com", credentials: true}))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 app.use(passport.session());
-
-//debugging
-app.use((req, res, next) => {
-  console.log('Session ID:', req.sessionID);
-  console.log('Is Authenticated:', req.isAuthenticated());
-  console.log('User:', req.user); // Should have the deserialized user object
-  console.log('Session Passport User:', req.session?.passport?.user);
-  next();
-});
-
 
 
 async function createTables() {
@@ -82,6 +74,9 @@ async function createTables() {
 }
 
 await createTables();
+
+//tobedeleted, this one for temp use
+
 
 
 async function showNotes(user) {
@@ -251,6 +246,8 @@ app.get("/api/show-data/:user", async (req, res) => {
         return res.status(200).json({ message: "Login success" });
       });
     })(req, res, next);
+
+
   });
   
 
@@ -308,20 +305,10 @@ app.get("/api/show-data/:user", async (req, res) => {
 
 
   passport.serializeUser((user, cb) => {
-    if (user) {
-      console.log("We have stored"+ user.uid + " " + user.user_name + " " + user.password)
-    }else{
-      console.log("nothing store")
-    }
     cb(null, user);
   });
   
   passport.deserializeUser((user, cb) => {
-    if (user) {
-      console.log("We have got"+ user.uid + " " + user.user_name + " " + user.password)
-    }else{
-      console.log("nothing got")
-    }
     cb(null, user);
   });
   

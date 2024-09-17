@@ -6,15 +6,16 @@ import CreateArea from "./CreateArea";
 import axios from "axios"
 import { useNavigate } from "react-router-dom";
 
-//production mode
-const REACT_API_ADDRESS = 'https://server-dot-keeper-app-432221.uc.r.appspot.com'
+export const baseAPI = axios.create({
+  baseURL: 'https://server-dot-keeper-app-432221.uc.r.appspot.com',
+  withCredentials: true
+})
 
 function App() {
 
-
   async function verifyUser(nav, set) {
     try {
-       await axios.get(`${REACT_API_ADDRESS}/api/verify`, {}, {withCredentials: true})
+       await baseAPI.get("/api/verify")
        set(false)
     } catch {
       nav("/")
@@ -23,13 +24,12 @@ function App() {
 
   async function getUser() {
     try {
-      const response = await axios.get(`${REACT_API_ADDRESS}/api/verify` , {}, {withCredentials: true})
+      const response = await baseAPI.get("/api/verify")
       return response.data.user
     } catch (err) {
       console.log(err)
     }
   }
-
 
   const [notes, setNotes] = useState([]);
   const [updateTrigger, setUpdateTrigger] = useState(false); 
@@ -37,23 +37,19 @@ function App() {
   const [user, setUser] = useState(null)
   const nav = useNavigate()
 
-  //initialization
+  //promise all
   useEffect(() => {
     async function loading() {
-      const [temp, val] = await Promise.all([
-        verifyUser(nav, setLoading),  
-        getUser(),        
-      ])
-      setUser(val)
-    }
+       await verifyUser(nav, setLoading)
+       setUser(await getUser())
+    } 
     loading()
   },[])
-  
 
 
   async function getNote() {
     try {
-      const response = await axios.get(`${REACT_API_ADDRESS}/api/show-data/${user}`, {}, {withCredentials: true})
+      const response = await baseAPI.get(`/api/show-data/${user}`)
       setNotes(response.data)
     } catch (err) {
       console.log("ERROR FOR", err)
@@ -62,7 +58,7 @@ function App() {
 
   async function deleteNote(id) {
     try {
-      await axios.delete(`${REACT_API_ADDRESS}/api/delete-data/${id}`, {}, {withCredentials: true})
+      await baseAPI.delete(`/api/delete-data/${id}`)
       setUpdateTrigger(!updateTrigger)
     } catch (err) {
       console.log("ERROR FOR", err)
@@ -71,7 +67,7 @@ function App() {
 
   async function editNote(note) {
     try {
-      await axios.patch(`${REACT_API_ADDRESS}/api/edit-data/note/`, note)
+      await baseAPI.patch("/api/edit-data/note/", note)
       setUpdateTrigger(!updateTrigger)
     } catch (err) {
       console.log("ERROR FOR", err)
@@ -81,7 +77,7 @@ function App() {
   async function insertNote(note) {
     try {
       console.log(user)
-      await axios.post(`${REACT_API_ADDRESS}/api/post-data/note/${user}`, note)
+      await baseAPI.post(`/api/post-data/note/${user}`, note)
       setUpdateTrigger(!updateTrigger)
     } catch (err) {
       console.log("ERROR FOR", err)
@@ -91,13 +87,13 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       if (user)
-        await getNote()
-          
+        await getNote();
     };
     fetchData();
   }, [updateTrigger, user]);
 
-//{acceptLinkAwait ? <Confirmation detail={user}/> : <BasicSelect addU = {postLinkedUser} curU = {user}/>}
+
+
   return (
     !loading &&
     <div>
