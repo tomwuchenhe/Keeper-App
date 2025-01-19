@@ -51,11 +51,7 @@
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
 </details>
 
@@ -64,26 +60,12 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Keeper App]](https://keeper-app-432221.uc.r.appspot.com/)
-
-TODO
-
-Here's why:
-* Your time should be focused on creating something amazing. A project that solves a problem and helps others
-* You shouldn't be doing the same tasks over and over like creating a README from scratch
-* You should implement DRY principles to the rest of your life :smile:
-
-Of course, no one template will serve all projects since your needs may be different. So I'll be adding more in the near future. You may also suggest changes by forking this repo and creating a pull request or opening an issue. Thanks to all the people have contributed to expanding this template!
-
-Use the `BLANK_README.md` to get started.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
+[Keeper App](https://keeper-app-432221.uc.r.appspot.com/)
 
 
 ### Built With
 
-* [![React][React.js]][React-url]
+* React.JS, Express.JS and various libraries
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -94,11 +76,12 @@ Use the `BLANK_README.md` to get started.
 
 Node index.js for back-end
 npm run dev for front-end
+Needs to download postgreSQL instance for local running, see official webpage on how to download
 
 ### Prerequisites
 
 This is an example of how to list things you need to use the software and how to install them.
-* npm i
+* npm install
 
 
 
